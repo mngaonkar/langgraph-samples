@@ -4,6 +4,9 @@ from langchain.tools import BaseTool, StructuredTool, tool
 from typing import Type, Optional, Any
 from playwright.sync_api import sync_playwright
 import re
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 from langchain.callbacks.manager import (
     AsyncCallbackManagerForToolRun,
@@ -22,6 +25,7 @@ class VisitWebPageSyncTool(BaseTool):
     def _run(self, url: str, 
              clean_flag=True, 
              run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
+        logger.info(f"Visiting webpage: {url} with clean_flag={clean_flag}")
         with sync_playwright() as p:
             try:
                 browser = p.chromium.launch(headless=False)
