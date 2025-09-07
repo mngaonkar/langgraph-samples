@@ -35,7 +35,7 @@ class FreeBusyTool(BaseTool):
 
     @property
     def credentials(self):
-        SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+        SCOPES = ['https://www.googleapis.com/auth/calendar']
         return service_account.Credentials.from_service_account_file(
             self.service_account_file, scopes=SCOPES)
 
@@ -53,6 +53,24 @@ class FreeBusyTool(BaseTool):
 
         logger.debug(f"####### Querying free/busy from {start_time} to {end_time} for duration {duration_minutes} minutes on calendar {calendar_id}")
         try:
+            # calendar_id = 'mahadev.gaonkar@gmail.com'  # replace with actual calendar ID
+
+            # self.service.calendarList().insert(
+            #     body={
+            #         'id': calendar_id
+            #     }
+            # ).execute()
+
+            # Call the CalendarList API to get calendars
+            calendar_list = self.service.calendarList().list().execute()
+            logger.debug(f"##### Fetched {len(calendar_list.get('items', []))} calendars")
+
+            # Extract and print calendar IDs and summaries
+            for calendar_entry in calendar_list.get('items', []):
+                logger.info(f"Calendar Summary: {calendar_entry.get('summary')}")
+                logger.info(f"Calendar ID: {calendar_entry.get('id')}")
+                logger.info('---')
+
             # Fetch events
             events_result = self.service.events().list(
                 calendarId=calendar_id,
@@ -129,7 +147,7 @@ async def main():
     builder.add_edge("tools", "call_model")
 
     graph = builder.compile()
-    query = "Find me a 45-minute free slot on Sep 9, 2025 from  10 AM to 6 PM."
+    query = "Find me a 45-minute free slot on Sep 11, 2025 from  12 AM to 11 PM."
     response = await graph.ainvoke(
         {
             "messages": [{"role": "user", "content": query}]
