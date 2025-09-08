@@ -12,6 +12,7 @@ You will help plan the steps to implement a LangGraph application based on the u
 - ## Scope: A short description that lays out the scope of the project with up to 5 bullet points
 - ## URLs: A list of the {num_urls} relevant URLs to reference in order to implement the project
 6. Finally, transfer to the research agent using the transfer_to_researcher_agent tool.
+7. Do not implement the solution yourself, handoff to the researcher agent.
 </Instructions>
 """
 
@@ -90,17 +91,9 @@ agent_swarm = create_swarm(
 )
 
 app = agent_swarm.compile(checkpointer=checkpointer)
-request = "Create a LangGraph application that is a prompt chain: it takes a topic from a user, generates a joke, and checks if the joke has a punchline."
 config = {"configurable": {"thread_id": "1"}}
 
-print_stream(
-    app.stream(
-        {"messages": [{"role": "user", "content": request}]},
-        config=config,
-        subgraphs=True
-    )
-)
-
+print("Enter a user request to create a LangGraph application (q or quit to exit):")
 while True:
     user_input = input("USER> ")
     if user_input == "q" or user_input == "quit":
