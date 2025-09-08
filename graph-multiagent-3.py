@@ -18,6 +18,7 @@ research_agent = create_react_agent(
 
 INSTRUCTIONS:
 - Assist ONLY with research-related tasks, DO NOT do any math
+- Use math agent for any calculations
 - After you're done with your tasks, respond to the supervisor directly
 - Respond ONLY with the results of your work, do NOT include ANY other text.""",
     name="research_agent",
@@ -51,6 +52,7 @@ supervisor = create_supervisor(
     model=init_chat_model("openai:gpt-4o"),
     agents=[research_agent, math_agent],
     prompt="""You are a supervisor managing two agents:
+- break task into smaller tasks and assign each task to the appropriate agent
 - a research agent. Assign research-related tasks to this agent
 - a math agent. Assign math-related tasks to this agent
 

@@ -42,12 +42,16 @@ from langgraph.prebuilt import create_react_agent
 from langgraph_swarm import create_handoff_tool, create_swarm
 from langchain_google_vertexai import ChatVertexAI
 from langgraph.checkpoint.memory import InMemorySaver
+from langchain_ollama import ChatOllama
 
 from dotenv import load_dotenv
 load_dotenv()
 
-model1 = init_chat_model(model="gpt-4o-mini", model_provider="openai")
-model2 = ChatVertexAI(model="gemini-2.0-flash", temperature=0)
+# model1 = init_chat_model(model="gpt-4o-mini", model_provider="openai")
+# model2 = ChatVertexAI(model="gemini-2.0-flash", temperature=0)
+
+model1 = ChatOllama(model="qwen3:8b", temperature=0)
+model2 = ChatOllama(model="qwen3:8b", temperature=0)
 
 # result = model1.invoke("What is 2+2?")
 # print(f"result = {result.content}")
