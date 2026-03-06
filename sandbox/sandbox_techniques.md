@@ -85,3 +85,20 @@ You can now call this from your LangGraph agent via podman exec or systemd API �
 | Ecosystem / tools | Huge (VS Code, CI, etc.) | Very good + growing fast | Docker (still) |
 | Resource overhead | Slightly higher (daemon) | Lower | Podman |
 | Port binding <1024 | Possible with extra capabilities | Needs sysctl or rootful for privileged ports | Docker (easier) |
+
+# Key Differences - Docker vs Podman for Agent Sandboxing (2026)
+
+| Aspect | Docker (2026 status) | Podman (2026 status) | Winner / When to Choose |
+|---|---|---|---|
+| Architecture | Client-server model with a central daemon (`dockerd`) that runs as root (or rootless with extra setup) | Daemonless — each `podman` command forks processes directly (no persistent background service) | Podman — no single point of failure, lower idle overhead |
+| Root / Privilege | Daemon traditionally runs as root; rootless mode available but not default and has limitations | Rootless by default on Linux — containers run as your normal user (user namespaces) | Podman — inherently more secure for untrusted code |
+| Resource Usage | Higher idle memory (~100–150 MB for daemon + overhead per container) | Lower memory (no daemon → 15–35% less RAM in benchmarks; scales better with many containers) | Podman — especially on servers or edge devices |
+| Startup Speed | Slightly faster individual container starts in some benchmarks (e.g. ~150 ms vs ~180 ms) | Very close; sometimes marginally slower, but no daemon startup penalty | Tie (negligible in practice) |
+| Security | Good when hardened (seccomp, AppArmor, rootless mode, capability drops), but daemon is a larger attack surface | Better defaults: no root daemon, fewer privileges, easier to confine with systemd | Podman — preferred for security-sensitive / sandbox use (e.g. AI agents) |
+| Systemd Integration | Manual (generate units or use third-party tools) | Native & excellent via Quadlets (`.container`, `.pod`, `.network` files become systemd units) | Podman — cleaner for production servers |
+| Pods / Kubernetes | Supports pods via Docker Compose (limited) | Native pod support + `podman generate kube` → direct YAML for Kubernetes | Podman — if you target K8s |
+| CLI Compatibility | Original standard (`docker run`, `docker build`, etc.) | Almost 100% drop-in compatible (`podman run` = `docker run`, aliases available) | Tie — most scripts work unchanged |
+| Networking (rootless) | Uses `slirp4netns` (functional but slower) | `slirp4netns` or `pasta` (newer, faster user-mode networking) | Slight edge to Podman |
+| Ecosystem & Adoption | Still dominates developer tools, CI/CD, Docker Desktop, Compose v2, vast community | Growing fast (especially enterprise/Red Hat/Fedora), but smaller ecosystem overall | Docker — for maximum tooling & compatibility |
+| Docker Desktop | Paid for large organizations/companies (free for personal/small teams) | No equivalent paid desktop app needed — works natively on Linux/macOS/Windows (via WSL2/VM) | Podman — no licensing surprises |
+| Orchestration | Docker Swarm (declining) + Kubernetes support via plugins | No built-in Swarm; native Kubernetes YAML generation | Depends on needs |
