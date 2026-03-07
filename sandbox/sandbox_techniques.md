@@ -102,3 +102,40 @@ You can now call this from your LangGraph agent via podman exec or systemd API �
 | Ecosystem & Adoption | Still dominates developer tools, CI/CD, Docker Desktop, Compose v2, vast community | Growing fast (especially enterprise/Red Hat/Fedora), but smaller ecosystem overall | Docker — for maximum tooling & compatibility |
 | Docker Desktop | Paid for large organizations/companies (free for personal/small teams) | No equivalent paid desktop app needed — works natively on Linux/macOS/Windows (via WSL2/VM) | Podman — no licensing surprises |
 | Orchestration | Docker Swarm (declining) + Kubernetes support via plugins | No built-in Swarm; native Kubernetes YAML generation | Depends on needs |
+
+# Firecracker microVM (local)
+
+# WebAssembly + Pyodide / wasmtime / wasmer 
+## Pyodide + langchain-sandbox (Official & Easiest)
+
+LangChain released langchain-sandbox (~2025) specifically for this: it runs Python in Pyodide (WebAssembly) inside a Deno runtime for extra isolation.
+
+### Step 1: Installation
+```bash
+pip install langchain-sandbox
+# Also install your LLM provider + langgraph if not already present
+pip install langgraph langchain-openai   # or anthropic, groq, etc.
+```
+
+### Step 2: Basic Sandbox Usage
+```python
+from langchain_sandbox import PyodideSandbox
+
+sandbox = PyodideSandbox(
+    allow_net=False,          # ← critical for safety (blocks network)
+    allow_fs=False,           # no filesystem access
+    # allow_install=True,     # if you want micropip to install pure-python packages
+)
+
+result = sandbox.run_code("""
+print("Hello from safe WASM Python!")
+import math
+print(math.sqrt(16))
+""")
+
+print(result.stdout)   # "Hello from safe WASM Python!\n4.0\n"
+print(result.stderr)   # usually empty
+```
+
+
+
