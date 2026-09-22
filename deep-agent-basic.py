@@ -1,8 +1,9 @@
-from deepagents import create_deep_agent
 import os
+
+from deepagents import create_deep_agent
+from dotenv import load_dotenv
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
-from dotenv import load_dotenv
 
 
 load_dotenv()
