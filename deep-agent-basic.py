@@ -1,4 +1,5 @@
 from deepagents import create_deep_agent
+import os
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
@@ -18,7 +19,13 @@ def get_weather(city: str) -> str:
     return weather_by_city.get(city.lower(), "Weather data is unavailable.")
 
 
+def require_env(name: str) -> None:
+    if not os.getenv(name):
+        raise ValueError(f"Please set {name} before running this sample.")
+
+
 def main() -> None:
+    require_env("OPENAI_API_KEY")
     model = ChatOpenAI(model="gpt-4o-mini")
     agent = create_deep_agent(
         name="WeatherAssistant",

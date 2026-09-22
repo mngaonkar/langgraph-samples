@@ -37,11 +37,20 @@ Gather credible information and respond with:
 """
 
 
+def require_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise ValueError(f"Please set {name} before running this sample.")
+    return value
+
+
 @lru_cache(maxsize=1)
 def get_tavily_client() -> TavilyClient:
-    return TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
+    return TavilyClient(api_key=require_env("TAVILY_API_KEY"))
+
 
 def main() -> None:
+    require_env("OPENAI_API_KEY")
     model = ChatOpenAI(model="gpt-4o-mini")
     agent = create_deep_agent(
         name="ResearchAssistant",
