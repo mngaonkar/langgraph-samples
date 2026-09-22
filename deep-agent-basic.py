@@ -1,0 +1,38 @@
+from deepagents import create_deep_agent
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+
+@tool
+def get_weather(city: str) -> str:
+    """Get current weather for a city."""
+    weather_by_city = {
+        "new york": "72°F and sunny",
+        "san francisco": "64°F and foggy",
+        "london": "59°F and rainy",
+    }
+    return weather_by_city.get(city.lower(), "Weather data is unavailable.")
+
+
+model = ChatOpenAI(model="gpt-4o-mini")
+
+agent = create_deep_agent(
+    name="WeatherAssistant",
+    system_prompt="You are a helpful weather assistant.",
+    tools=[get_weather],
+    model=model,
+)
+
+response = agent.invoke(
+    {
+        "messages": [
+            {"role": "user", "content": "What is the weather in New York today?"}
+        ]
+    }
+)
+
+print(response["messages"][-1].content)
