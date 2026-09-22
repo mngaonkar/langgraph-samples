@@ -1,4 +1,5 @@
 import os
+from functools import lru_cache
 from typing import Literal
 
 from deepagents import create_deep_agent
@@ -17,7 +18,7 @@ def internet_search(
     include_raw_content: bool = False,
 ):
     """Run an internet search for research tasks."""
-    tavily_client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
+    tavily_client = get_tavily_client()
     return tavily_client.search(
         query=query,
         max_results=max_results,
@@ -32,6 +33,11 @@ Gather credible information and respond with:
 2) Risks/limitations
 3) A short final summary
 """
+
+
+@lru_cache(maxsize=1)
+def get_tavily_client() -> TavilyClient:
+    return TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
 
 def main() -> None:
     model = ChatOpenAI(model="gpt-4o-mini")
