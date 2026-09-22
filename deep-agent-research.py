@@ -4,6 +4,7 @@ from typing import Literal
 
 from deepagents import create_deep_agent
 from dotenv import load_dotenv
+from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from tavily import TavilyClient
 
@@ -11,6 +12,7 @@ from tavily import TavilyClient
 load_dotenv()
 
 
+@tool
 def internet_search(
     query: str,
     max_results: int = 5,
