@@ -9,8 +9,6 @@ from tavily import TavilyClient
 
 load_dotenv()
 
-tavily_client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
-
 
 def internet_search(
     query: str,
@@ -19,6 +17,7 @@ def internet_search(
     include_raw_content: bool = False,
 ):
     """Run an internet search for research tasks."""
+    tavily_client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
     return tavily_client.search(
         query=query,
         max_results=max_results,
@@ -34,24 +33,26 @@ Gather credible information and respond with:
 3) A short final summary
 """
 
-model = ChatOpenAI(model="gpt-4o-mini")
+def main() -> None:
+    model = ChatOpenAI(model="gpt-4o-mini")
+    agent = create_deep_agent(
+        name="ResearchAssistant",
+        system_prompt=research_prompt,
+        tools=[internet_search],
+        model=model,
+    )
+    response = agent.invoke(
+        {
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Explain quantum computing and practical applications.",
+                }
+            ]
+        }
+    )
+    print(response["messages"][-1].content)
 
-agent = create_deep_agent(
-    name="ResearchAssistant",
-    system_prompt=research_prompt,
-    tools=[internet_search],
-    model=model,
-)
 
-response = agent.invoke(
-    {
-        "messages": [
-            {
-                "role": "user",
-                "content": "Explain quantum computing and practical applications.",
-            }
-        ]
-    }
-)
-
-print(response["messages"][-1].content)
+if __name__ == "__main__":
+    main()
